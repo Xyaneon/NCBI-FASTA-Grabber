@@ -19,8 +19,20 @@
 # Christopher Kyle Horton (000516274), chorton@ltu.edu
 # Last modified: 9/16/2014
 
-accession_number = input("Please enter your accession number: ")
+import urllib
+
+accession_number = raw_input("Please enter your accession number: ")
 while True:
-    ncbi_database = input("Which database should be searched (protein or nucleotide)?: ")
+    ncbi_database = raw_input("Which database should be searched (protein or nucleotide)?: ")
     if ncbi_database in ["protein", "nucleotide"]:
          break;
+    else:
+        print "Sorry, your input was not understood. Try again."
+
+search_url = "http://eutils.ncbi.nlm.nih.gov/entrez/eutils/"
+search_url += "esummary.fcgi?db=" + ncbi_database
+search_url += "&id=" + accession_number
+
+search_xml = urllib.urlopen(search_url).read()
+
+print search_xml
