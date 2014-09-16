@@ -20,19 +20,48 @@
 # Last modified: 9/16/2014
 
 import urllib
+import xml.etree.ElementTree as elementtree
 
 accession_number = raw_input("Please enter your accession number: ")
 while True:
     ncbi_database = raw_input("Which database should be searched (protein or nucleotide)?: ")
     if ncbi_database in ["protein", "nucleotide"]:
-         break;
+         break
     else:
         print "Sorry, your input was not understood. Try again."
 
 search_url = "http://eutils.ncbi.nlm.nih.gov/entrez/eutils/"
-search_url += "esummary.fcgi?db=" + ncbi_database
-search_url += "&id=" + accession_number
+search_url += "esearch.fcgi?db=" + ncbi_database
+search_url += "&term=" + accession_number + "[accn]"
 
 search_xml = urllib.urlopen(search_url).read()
+root = elementtree.fromstring(search_xml)
 
-print search_xml
+# Check if there were any matches
+results_count = 0
+for count in root.iter("Count"):
+    results_count = int(count.text)
+
+results_id = ""
+if results_count > 0:
+    for id_tag in root.iter("Id"):
+        results_id = id_tag.text
+        print results_id
+        break
+else:
+    print "No results found."
+    exit()
+
+#TODO: print summary for result.
+
+while True:
+    confirmation = raw_input("Is this the result you were looking for (yes or no)?: ")
+    if confirmation in ["yes", "no"]:
+        if confirmation == "yes":
+            print "TODO: get FASTA sequence"
+        else:
+            print "Sorry about that."
+            exit()
+        break
+
+exit()
