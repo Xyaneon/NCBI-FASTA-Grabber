@@ -21,6 +21,7 @@
 
 import urllib
 import xml.etree.ElementTree as elementtree
+import pyperclip
 
 accession_number = raw_input("Please enter your accession number: ")
 while True:
@@ -93,15 +94,16 @@ fetch_url = eutils_url + "efetch.fcgi?db=" + ncbi_database
 fetch_url += "&id=" + results_id
 fetch_url += "&rettype=fasta&retmode=text"
 
-fetch_xml = urllib.urlopen(fetch_url).read()
+fasta = urllib.urlopen(fetch_url).read()
 
-print fetch_xml
+print fasta
 
 while True:
-    confirmation = raw_input("\nCopy to clipboard (yes or no)?: ")
+    confirmation = raw_input("Copy to clipboard (yes or no)?: ")
     if confirmation in ["yes", "no"]:
         if confirmation == "yes":
-            print "TODO: copy to clipboard"
+            pyperclip.copy(fasta)
+            print "FASTA sequence copied to clipboard."
         else:
             print "Alright then. Bye!"
             exit()
