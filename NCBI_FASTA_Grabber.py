@@ -30,8 +30,9 @@ while True:
     else:
         print "Sorry, your input was not understood. Try again."
 
-search_url = "http://eutils.ncbi.nlm.nih.gov/entrez/eutils/"
-search_url += "esearch.fcgi?db=" + ncbi_database
+eutils_url = "http://eutils.ncbi.nlm.nih.gov/entrez/eutils/"
+
+search_url = eutils_url + "esearch.fcgi?db=" + ncbi_database
 search_url += "&term=" + accession_number + "[accn]"
 
 search_xml = urllib.urlopen(search_url).read()
@@ -46,16 +47,39 @@ results_id = ""
 if results_count > 0:
     for id_tag in root.iter("Id"):
         results_id = id_tag.text
-        print results_id
+        #print results_id
         break
 else:
     print "No results found."
     exit()
 
-#TODO: print summary for result.
+# Print summary for result. Need Caption, Title, and Extra
+summary_url = eutils_url + "esummary.fcgi?db=" + ncbi_database
+summary_url += "&id=" + results_id
+
+summary_xml = urllib.urlopen(summary_url).read()
+#print summary_xml
+root = elementtree.fromstring(summary_xml)
+
+caption_text = ""
+title_text = ""
+extra_text = ""
+
+for item in root.iter("Item"):
+    if item.attrib["Name"] == "Caption":
+        caption_text = item.text
+    if item.attrib["Name"] == "Title":
+        title_text = item.text
+    if item.attrib["Name"] == "Extra":
+        extra_text = item.text
+
+print
+print "CAPTION: ", caption_text
+print "TITLE: ", title_text
+print "EXTRA: ", extra_text
 
 while True:
-    confirmation = raw_input("Is this the result you were looking for (yes or no)?: ")
+    confirmation = raw_input("\nIs this the result you were looking for (yes or no)?: ")
     if confirmation in ["yes", "no"]:
         if confirmation == "yes":
             print "TODO: get FASTA sequence"
