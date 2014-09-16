@@ -82,9 +82,28 @@ while True:
     confirmation = raw_input("\nIs this the result you were looking for (yes or no)?: ")
     if confirmation in ["yes", "no"]:
         if confirmation == "yes":
-            print "TODO: get FASTA sequence"
+            print "\nFASTA sequence:"
         else:
             print "Sorry about that."
+            exit()
+        break
+
+# Fetch the sequence.
+fetch_url = eutils_url + "efetch.fcgi?db=" + ncbi_database
+fetch_url += "&id=" + results_id
+fetch_url += "&rettype=fasta&retmode=text"
+
+fetch_xml = urllib.urlopen(fetch_url).read()
+
+print fetch_xml
+
+while True:
+    confirmation = raw_input("\nCopy to clipboard (yes or no)?: ")
+    if confirmation in ["yes", "no"]:
+        if confirmation == "yes":
+            print "TODO: copy to clipboard"
+        else:
+            print "Alright then. Bye!"
             exit()
         break
 
