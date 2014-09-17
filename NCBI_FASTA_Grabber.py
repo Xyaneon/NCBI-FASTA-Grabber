@@ -23,25 +23,74 @@ import urllib
 import xml.etree.ElementTree as elementtree
 import pyperclip
 
+eutils_url = "http://eutils.ncbi.nlm.nih.gov/entrez/eutils/"
+
 def answer(question):
     '''Returns an answer to a question.'''
     return raw_input(question).lower()
 
+def show_invalid_input_message():
+    '''Print an error message for invalid input.'''
+    print "Sorry, your input was not understood. Try again."
+
+def get_from_url(url):
+    '''Gets input from a given URL to open.'''
+    return urllib.urlopen(url).read()
+
+def construct_search_url(database, accession_number):
+    '''Creates the search URL string.'''
+    url = eutils_url + "esearch.fcgi?db=" + database
+    url += "&term=" + accession_number + "[accn]"
+    return url
+
+def construct_summary_url(database, results_id):
+    '''Creates the summary URL string.'''
+    url = eutils_url + "esummary.fcgi?db=" + database
+    url += "&id=" + results_id
+    return url
+
+def construct_fetch_url(database, results_id):
+    '''Creates the fetch URL string.'''
+    url = eutils_url + "efetch.fcgi?db=" + database
+    url += "&id=" + results_id
+    url += "&rettype=fasta&retmode=text"
+    return url
+
+def print_summary(title, caption, extra):
+    '''Prints the formatted summary information.'''
+    print
+    print "CAPTION: ", caption
+    print "TITLE:   ", title
+    print "EXTRA:   ", extra
+
+def ask_yes_no(question, no_string):
+    '''Exit this function only when the user answers yes to a yes/no
+    question. Also, show a string and quit the program if the answer is no.'''
+    while True:
+        confirmation = answer(question + " (yes or no)?: ")
+        if confirmation in ["yes", "no"]:
+            if confirmation == "yes":
+                return
+            elif confirmation == "no":
+                print no_string
+                exit()
+        else:
+            show_invalid_input_message()
+
+
+# Start of program
+
+
 accession_number = raw_input("Please enter your accession number: ")
 while True:
     question = "Which database should be searched (protein or nucleotide)?: "
-    ncbi_database = answer(question)
-    if ncbi_database in ["protein", "nucleotide"]:
-         break
+    database = answer(question)
+    if database in ["protein", "nucleotide"]:
+        break
     else:
-        print "Sorry, your input was not understood. Try again."
+        show_invalid_input_message()
 
-eutils_url = "http://eutils.ncbi.nlm.nih.gov/entrez/eutils/"
-
-search_url = eutils_url + "esearch.fcgi?db=" + ncbi_database
-search_url += "&term=" + accession_number + "[accn]"
-
-search_xml = urllib.urlopen(search_url).read()
+search_xml = get_from_url(construct_search_url(database, accession_number))
 root = elementtree.fromstring(search_xml)
 
 # Check if there were any matches
@@ -53,67 +102,39 @@ results_id = ""
 if results_count > 0:
     for id_tag in root.iter("Id"):
         results_id = id_tag.text
-        #print results_id
         break
+    if results_count != 1:
+        print results_count + " results found. Showing only the first."
 else:
     print "No results found."
     exit()
 
 # Print summary for result. Need Caption, Title, and Extra
-summary_url = eutils_url + "esummary.fcgi?db=" + ncbi_database
-summary_url += "&id=" + results_id
-
-summary_xml = urllib.urlopen(summary_url).read()
-#print summary_xml
+summary_xml = get_from_url(construct_summary_url(database, results_id))
 root = elementtree.fromstring(summary_xml)
 
-caption_text = ""
-title_text = ""
-extra_text = ""
+caption = "n/a"
+title = "n/a"
+extra = "n/a"
 
 for item in root.iter("Item"):
     if item.attrib["Name"] == "Caption":
-        caption_text = item.text
+        caption = item.text
     if item.attrib["Name"] == "Title":
-        title_text = item.text
+        title = item.text
     if item.attrib["Name"] == "Extra":
-        extra_text = item.text
+        extra = item.text
 
-print
-print "CAPTION: ", caption_text
-print "TITLE:   ", title_text
-print "EXTRA:   ", extra_text
+print_summary(caption, title, extra)
 
-while True:
-    question = "\nIs this the result you were looking for (yes or no)?: "
-    confirmation = answer(question)
-    if confirmation in ["yes", "no"]:
-        if confirmation == "yes":
-            print "\nFASTA sequence:"
-        else:
-            print "Sorry about that."
-            exit()
-        break
+ask_yes_no("\nIs this the result you were looking for", "Sorry about that.")
 
-# Fetch the sequence.
-fetch_url = eutils_url + "efetch.fcgi?db=" + ncbi_database
-fetch_url += "&id=" + results_id
-fetch_url += "&rettype=fasta&retmode=text"
-
-fasta = urllib.urlopen(fetch_url).read()
-
+print "\nFASTA sequence:"
+fasta = get_from_url(construct_fetch_url(database, results_id))
 print fasta
 
-while True:
-    question = "Copy to clipboard (yes or no)?: "
-    confirmation = answer(question)
-    if confirmation in ["yes", "no"]:
-        if confirmation == "yes":
-            pyperclip.copy(fasta)
-            print "FASTA sequence copied to clipboard."
-        else:
-            print "Alright then. Bye!"
-            exit()
-        break
+ask_yes_no("Copy to clipboard", "Alright then. Bye!")
+pyperclip.copy(fasta)
+print "FASTA sequence copied to clipboard."
 
 exit()
