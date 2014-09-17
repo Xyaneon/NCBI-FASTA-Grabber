@@ -13,7 +13,7 @@ Follow the prompts.
 
 ## Technical Details ##
 
-This utility requires Python 2.7 to run, and makes use of the [NCBI eUtilities][2] and [Pyperclip][3]. Tested on Windows 8.1 and elementary OS Freya Beta 1.
+This utility requires Python 2.7 to run, and makes use of the [NCBI eUtilities][2] and [Pyperclip][3]. Tested on Windows 8.1, Ubuntu 14.04 LTS and elementary OS Freya Beta 1.
 
 This is my submission for Homework 1 for MCS 5603 Intro to Bioinformatics, Fall 2014 at Lawrence Technological University. Written in Python, and hosted on GitHub with Professor Miller's permission.
 
