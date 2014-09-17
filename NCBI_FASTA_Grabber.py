@@ -17,7 +17,7 @@
 
 # MCS 5603 Intro to Bioinformatics, Fall 2014
 # Christopher Kyle Horton (000516274), chorton@ltu.edu
-# Last modified: 9/16/2014
+# Last modified: 9/17/2014
 
 import urllib
 import xml.etree.ElementTree as elementtree
@@ -142,3 +142,33 @@ pyperclip.copy(fasta)
 print "FASTA sequence copied to clipboard."
 
 exit()
+
+# Sample output:
+#
+#christopher@ArcticThunder:~/NCBI-FASTA-Grabber$ python NCBI_FASTA_Grabber.py 
+#Gtk-Message: Failed to load module "canberra-gtk-module"
+#Please enter your accession number: NM_000518
+#Which database should be searched (protein or nucleotide)?: nucleotide
+#
+#CAPTION:  Homo sapiens hemoglobin, beta (HBB), mRNA
+#TITLE:    NM_000518
+#EXTRA:    gi|28302128|ref|NM_000518.4|[28302128]
+#
+#Is this the result you were looking for (yes or no)?: yes
+#
+#FASTA sequence:
+#
+#>gi|28302128|ref|NM_000518.4| Homo sapiens hemoglobin, beta (HBB), mRNA
+#ACATTTGCTTCTGACACAACTGTGTTCACTAGCAACCTCAAACAGACACCATGGTGCATCTGACTCCTGA
+#GGAGAAGTCTGCCGTTACTGCCCTGTGGGGCAAGGTGAACGTGGATGAAGTTGGTGGTGAGGCCCTGGGC
+#AGGCTGCTGGTGGTCTACCCTTGGACCCAGAGGTTCTTTGAGTCCTTTGGGGATCTGTCCACTCCTGATG
+#CTGTTATGGGCAACCCTAAGGTGAAGGCTCATGGCAAGAAAGTGCTCGGTGCCTTTAGTGATGGCCTGGC
+#TCACCTGGACAACCTCAAGGGCACCTTTGCCACACTGAGTGAGCTGCACTGTGACAAGCTGCACGTGGAT
+#CCTGAGAACTTCAGGCTCCTGGGCAACGTGCTGGTCTGTGTGCTGGCCCATCACTTTGGCAAAGAATTCA
+#CCCCACCAGTGCAGGCTGCCTATCAGAAAGTGGTGGCTGGTGTGGCTAATGCCCTGGCCCACAAGTATCA
+#CTAAGCTCGCTTTCTTGCTGTCCAATTTCTATTAAAGGTTCCTTTGTTCCCTAAGTCCAACTACTAAACT
+#GGGGGATATTATGAAGGGCCTTGAGCATCTGGATTCTGCCTAATAAAAAACATTTATTTTCATTGC
+#
+#
+#Copy to clipboard (yes or no)?: yes
+#FASTA sequence copied to clipboard.
