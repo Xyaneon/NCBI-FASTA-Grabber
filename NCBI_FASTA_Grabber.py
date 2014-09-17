@@ -108,7 +108,7 @@ parser.add_argument("-n", "--nucleotide", help="search the nucleotide database",
 
 args = parser.parse_args()
 
-accession_number = raw_input("Please enter your accession number: ")
+database = ""
 if args.protein or args.nucleotide:
     if args.protein and args.nucleotide:
         print "Error: only one database may be specified in options."
@@ -117,7 +117,9 @@ if args.protein or args.nucleotide:
         database = "protein"
     else:
         database = "nucleotide"
-else:
+
+accession_number = raw_input("Please enter your accession number: ")
+if database == "":
     database = ask_for_database()
 
 search_xml = get_from_url(construct_search_url(database, accession_number))
