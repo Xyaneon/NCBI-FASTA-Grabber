@@ -7,9 +7,15 @@ This is a small cross-platform utility for retrieving [NCBI][1] sequences in the
 
 ## Usage ##
 
-`python NCBI_FASTA_Grabber.py`
+To run in interactive mode:
 
-Follow the prompts.
+    python NCBI_FASTA_Grabber.py
+
+...and just follow the prompts.
+
+You can also run this program with various commandline options, which is handy if you want to use it as part of a script. To see the options available, type instead:
+
+    python NCBI_FASTA_Grabber.py -h
 
 ## Technical Details ##
 
