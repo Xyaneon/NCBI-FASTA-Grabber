@@ -81,8 +81,8 @@ for item in root.iter("Item"):
 
 print
 print "CAPTION: ", caption_text
-print "TITLE: ", title_text
-print "EXTRA: ", extra_text
+print "TITLE:   ", title_text
+print "EXTRA:   ", extra_text
 
 while True:
     question = "\nIs this the result you were looking for (yes or no)?: "
