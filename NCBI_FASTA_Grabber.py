@@ -23,9 +23,14 @@ import urllib
 import xml.etree.ElementTree as elementtree
 import pyperclip
 
+def answer(question):
+    '''Returns an answer to a question.'''
+    return raw_input(question).lower()
+
 accession_number = raw_input("Please enter your accession number: ")
 while True:
-    ncbi_database = raw_input("Which database should be searched (protein or nucleotide)?: ").lower()
+    question = "Which database should be searched (protein or nucleotide)?: "
+    ncbi_database = answer(question)
     if ncbi_database in ["protein", "nucleotide"]:
          break
     else:
@@ -80,7 +85,8 @@ print "TITLE: ", title_text
 print "EXTRA: ", extra_text
 
 while True:
-    confirmation = raw_input("\nIs this the result you were looking for (yes or no)?: ").lower()
+    question = "\nIs this the result you were looking for (yes or no)?: "
+    confirmation = answer(question)
     if confirmation in ["yes", "no"]:
         if confirmation == "yes":
             print "\nFASTA sequence:"
@@ -99,7 +105,8 @@ fasta = urllib.urlopen(fetch_url).read()
 print fasta
 
 while True:
-    confirmation = raw_input("Copy to clipboard (yes or no)?: ").lower()
+    question = "Copy to clipboard (yes or no)?: "
+    confirmation = answer(question)
     if confirmation in ["yes", "no"]:
         if confirmation == "yes":
             pyperclip.copy(fasta)
