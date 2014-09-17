@@ -67,15 +67,30 @@ def print_summary(title, caption, extra):
     print "TITLE:   ", title
     print "EXTRA:   ", extra
 
+def ask_for_database():
+    '''Ask the user which database they want to use and return it.'''
+    while True:
+        question = "Which database should be searched (p/protein or n/nucleotide)?: "
+        database = answer(question)
+        if database in ["protein", "nucleotide", "p", "n"]:
+            if database == "p":
+                database = "protein"
+            if database == "n":
+                database = "nucleotide"
+            break
+        else:
+            show_invalid_input_message()
+    return database
+
 def ask_yes_no(question, no_string):
     '''Exit this function only when the user answers yes to a yes/no
     question. Also, show a string and quit the program if the answer is no.'''
     while True:
-        confirmation = answer(question + " (yes or no)?: ")
-        if confirmation in ["yes", "no"]:
-            if confirmation == "yes":
+        confirmation = answer(question + " (Y/n)?: ")
+        if confirmation in ["yes", "no", "y", "n", ""]:
+            if confirmation in ["yes", "y", ""]:
                 return
-            elif confirmation == "no":
+            elif confirmation in ["no", "n"]:
                 print no_string
                 exit(0)
         else:
@@ -86,13 +101,7 @@ def ask_yes_no(question, no_string):
 
 
 accession_number = raw_input("Please enter your accession number: ")
-while True:
-    question = "Which database should be searched (protein or nucleotide)?: "
-    database = answer(question)
-    if database in ["protein", "nucleotide"]:
-        break
-    else:
-        show_invalid_input_message()
+database = ask_for_database()
 
 search_xml = get_from_url(construct_search_url(database, accession_number))
 root = elementtree.fromstring(search_xml)
@@ -145,7 +154,7 @@ exit()
 
 # Sample output:
 #
-#christopher@ArcticThunder:~/NCBI-FASTA-Grabber$ python NCBI_FASTA_Grabber.py 
+#christopher@ArcticThunder:~/NCBI-FASTA-Grabber$ python NCBI_FASTA_Grabber.py
 #Gtk-Message: Failed to load module "canberra-gtk-module"
 #Please enter your accession number: NM_000518
 #Which database should be searched (protein or nucleotide)?: nucleotide
