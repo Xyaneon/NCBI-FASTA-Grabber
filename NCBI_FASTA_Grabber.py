@@ -101,14 +101,22 @@ def ask_yes_no(question, no_string):
 # Start of program
 
 parser = argparse.ArgumentParser()
+yestoall_help = """answer yes to all questions and copy FASTA sequence to the
+clipboard automatically, if available"""
+parser.add_argument("-a", "--accessionnumber",
+                    help="specifies the accession number", type=str)
 parser.add_argument("-p", "--protein", help="search the protein database",
                     action="store_true")
 parser.add_argument("-n", "--nucleotide", help="search the nucleotide database",
                     action="store_true")
+parser.add_argument("-y", "--yestoall", help=yestoall_help, action="store_true")
 
 args = parser.parse_args()
 
+accession_number = ""
 database = ""
+if args.accessionnumber:
+    accession_number = args.accessionnumber
 if args.protein or args.nucleotide:
     if args.protein and args.nucleotide:
         print "Error: only one database may be specified in options."
@@ -118,7 +126,8 @@ if args.protein or args.nucleotide:
     else:
         database = "nucleotide"
 
-accession_number = raw_input("Please enter your accession number: ")
+if accession_number == "":
+    accession_number = raw_input("Please enter your accession number: ")
 if database == "":
     database = ask_for_database()
 
@@ -159,13 +168,15 @@ for item in root.iter("Item"):
 
 print_summary(caption, title, extra)
 
-ask_yes_no("\nIs this the result you were looking for", "Sorry about that.")
+if not args.yestoall:
+    ask_yes_no("\nIs this the result you were looking for", "Sorry about that.")
 
 fasta = get_from_url(construct_fetch_url(database, results_id))
 print "\nFASTA sequence:\n"
 print fasta
 
-ask_yes_no("Copy to clipboard", "Alright then. Bye!")
+if not args.yestoall:
+    ask_yes_no("Copy to clipboard", "Alright then. Bye!")
 pyperclip.copy(fasta)
 print "FASTA sequence copied to clipboard."
 
