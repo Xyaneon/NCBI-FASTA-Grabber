@@ -19,6 +19,7 @@
 # Christopher Kyle Horton (000516274), chorton@ltu.edu
 # Last modified: 9/17/2014
 
+import argparse
 import urllib
 import xml.etree.ElementTree as elementtree
 import pyperclip
@@ -99,9 +100,25 @@ def ask_yes_no(question, no_string):
 
 # Start of program
 
+parser = argparse.ArgumentParser()
+parser.add_argument("-p", "--protein", help="search the protein database",
+                    action="store_true")
+parser.add_argument("-n", "--nucleotide", help="search the nucleotide database",
+                    action="store_true")
+
+args = parser.parse_args()
 
 accession_number = raw_input("Please enter your accession number: ")
-database = ask_for_database()
+if args.protein or args.nucleotide:
+    if args.protein and args.nucleotide:
+        print "Error: only one database may be specified in options."
+        exit(1)
+    elif args.protein:
+        database = "protein"
+    else:
+        database = "nucleotide"
+else:
+    database = ask_for_database()
 
 search_xml = get_from_url(construct_search_url(database, accession_number))
 root = elementtree.fromstring(search_xml)
