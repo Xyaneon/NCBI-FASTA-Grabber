@@ -35,7 +35,11 @@ def show_invalid_input_message():
 
 def get_from_url(url):
     '''Gets input from a given URL to open.'''
-    return urllib.urlopen(url).read()
+    try:
+        return urllib.urlopen(url).read()
+    except IOError:
+        print "Error: Could not access NCBI. Check your Internet connection."
+        exit(1)
 
 def construct_search_url(database, accession_number):
     '''Creates the search URL string.'''
@@ -73,7 +77,7 @@ def ask_yes_no(question, no_string):
                 return
             elif confirmation == "no":
                 print no_string
-                exit()
+                exit(0)
         else:
             show_invalid_input_message()
 
@@ -107,7 +111,7 @@ if results_count > 0:
         print results_count + " results found. Showing only the first."
 else:
     print "No results found."
-    exit()
+    exit(2)
 
 # Print summary for result. Need Caption, Title, and Extra
 summary_xml = get_from_url(construct_summary_url(database, results_id))
@@ -129,8 +133,8 @@ print_summary(caption, title, extra)
 
 ask_yes_no("\nIs this the result you were looking for", "Sorry about that.")
 
-print "\nFASTA sequence:"
 fasta = get_from_url(construct_fetch_url(database, results_id))
+print "\nFASTA sequence:\n"
 print fasta
 
 ask_yes_no("Copy to clipboard", "Alright then. Bye!")
