@@ -17,22 +17,18 @@
 
 # MCS 5603 Intro to Bioinformatics, Fall 2014
 # Christopher Kyle Horton (000516274), chorton@ltu.edu
-# Last modified: 9/17/2014
+# Last modified: 11/24/2014
 
 import argparse
 import urllib
 import xml.etree.ElementTree as elementtree
-import pyperclip
 
-eutils_url = "http://eutils.ncbi.nlm.nih.gov/entrez/eutils/"
+import generate_output
+import url_construction
+import user_interaction
 
-def answer(question):
-    '''Returns an answer to a question.'''
-    return raw_input(question).lower()
-
-def show_invalid_input_message():
-    '''Print an error message for invalid input.'''
-    print "Sorry, your input was not understood. Try again."
+VERSION = "v1.2.0"
+DESC = "NCBI-FASTA-Grabber " + VERSION + "\nFetches FASTA sequences from NCBI."
 
 def get_from_url(url):
     '''Gets input from a given URL to open.'''
@@ -42,96 +38,42 @@ def get_from_url(url):
         print "Error: Could not access NCBI. Check your Internet connection."
         exit(1)
 
-def construct_search_url(database, accession_number):
-    '''Creates the search URL string.'''
-    url = eutils_url + "esearch.fcgi?db=" + database
-    url += "&term=" + accession_number + "[accn]"
-    return url
+#*****************************************************************************
+# Start of main program
+#*****************************************************************************
 
-def construct_summary_url(database, results_id):
-    '''Creates the summary URL string.'''
-    url = eutils_url + "esummary.fcgi?db=" + database
-    url += "&id=" + results_id
-    return url
-
-def construct_fetch_url(database, results_id):
-    '''Creates the fetch URL string.'''
-    url = eutils_url + "efetch.fcgi?db=" + database
-    url += "&id=" + results_id
-    url += "&rettype=fasta&retmode=text"
-    return url
-
-def print_summary(title, caption, extra):
-    '''Prints the formatted summary information.'''
-    print
-    print "CAPTION: ", caption
-    print "TITLE:   ", title
-    print "EXTRA:   ", extra
-
-def ask_for_database():
-    '''Ask the user which database they want to use and return it.'''
-    while True:
-        question = "Which database should be searched (p/protein or n/nucleotide)?: "
-        database = answer(question)
-        if database in ["protein", "nucleotide", "p", "n"]:
-            if database == "p":
-                database = "protein"
-            if database == "n":
-                database = "nucleotide"
-            break
-        else:
-            show_invalid_input_message()
-    return database
-
-def ask_yes_no(question, no_string):
-    '''Exit this function only when the user answers yes to a yes/no
-    question. Also, show a string and quit the program if the answer is no.'''
-    while True:
-        confirmation = answer(question + " (Y/n)?: ")
-        if confirmation in ["yes", "no", "y", "n", ""]:
-            if confirmation in ["yes", "y", ""]:
-                return
-            elif confirmation in ["no", "n"]:
-                print no_string
-                exit(0)
-        else:
-            show_invalid_input_message()
-
-
-# Start of program
-
-parser = argparse.ArgumentParser()
+parser = argparse.ArgumentParser(
+            formatter_class=argparse.RawDescriptionHelpFormatter,
+            description=DESC
+         )
 yestoall_help = """answer yes to all questions and copy FASTA sequence to the
 clipboard automatically, if available"""
+db_group = parser.add_mutually_exclusive_group()
 parser.add_argument("-a", "--accessionnumber",
                     help="specifies the accession number", type=str)
-parser.add_argument("-p", "--protein", help="search the protein database",
-                    action="store_true")
-parser.add_argument("-n", "--nucleotide", help="search the nucleotide database",
-                    action="store_true")
+db_group.add_argument("-p", "--protein", help="search the protein database",
+                      action="store_true")
+db_group.add_argument("-n", "--nucleotide",
+                      help="search the nucleotide database (default)",
+                      action="store_true")
 parser.add_argument("-y", "--yestoall", help=yestoall_help, action="store_true")
-
 args = parser.parse_args()
 
 accession_number = ""
 database = ""
 if args.accessionnumber:
     accession_number = args.accessionnumber
-if args.protein or args.nucleotide:
-    if args.protein and args.nucleotide:
-        print "Error: only one database may be specified in options."
-        exit(1)
-    elif args.protein:
-        database = "protein"
-    else:
-        database = "nucleotide"
+if args.protein:
+    database = "protein"
+else:
+    database = "nucleotide"
 
 if accession_number == "":
     accession_number = raw_input("Please enter your accession number: ")
 if database == "":
-    database = ask_for_database()
+    database = user_interaction.ask_for_database()
 
-search_xml = get_from_url(construct_search_url(database, accession_number))
+search_xml = get_from_url(url_construction.construct_search_url(database, accession_number))
 root = elementtree.fromstring(search_xml)
 
 # Check if there were any matches
@@ -152,7 +94,7 @@ else:
     exit(2)
 
 # Print summary for result. Need Caption, Title, and Extra
-summary_xml = get_from_url(construct_summary_url(database, results_id))
+summary_xml = get_from_url(url_construction.construct_summary_url(database, results_id))
 root = elementtree.fromstring(summary_xml)
 
 caption = "n/a"
@@ -167,18 +109,15 @@ for item in root.iter("Item"):
     if item.attrib["Name"] == "Extra":
         extra = item.text
 
-print_summary(caption, title, extra)
+generate_output.print_summary(caption, title, extra)
 
 if not args.yestoall:
-    ask_yes_no("\nIs this the result you were looking for", "Sorry about that.")
+    user_interaction.ask_yes_no("\nIs this the result you were looking for", "Sorry about that.")
 
-fasta = get_from_url(construct_fetch_url(database, results_id))
-print "\nFASTA sequence:\n"
-print fasta
+fasta = get_from_url(url_construction.construct_fetch_url(database, results_id))
 
-if not args.yestoall:
-    ask_yes_no("Copy to clipboard", "Alright then. Bye!")
-pyperclip.copy(fasta)
-print "FASTA sequence copied to clipboard."
+# Final sequence output
+generate_output.print_fasta(fasta)
+generate_output.ask_if_copy_to_clipboard(fasta, args.yestoall)
 
 exit(1)
