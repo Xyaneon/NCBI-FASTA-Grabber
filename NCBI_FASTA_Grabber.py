@@ -27,7 +27,7 @@ import generate_output
 import url_construction
 import user_interaction
 
-VERSION = "v1.3.0"
+VERSION = "v1.3.1"
 DESC = "NCBI-FASTA-Grabber " + VERSION + "\nFetches FASTA sequences from NCBI."
 
 def get_from_url(url):
@@ -37,6 +37,8 @@ def get_from_url(url):
     except IOError:
         print "Error: Could not access NCBI. Check your Internet connection."
         exit(1)
+
+FORMAT_CHOICES = ["fasta","fasta_cds_aa","fasta_cds_na"]
 
 #*****************************************************************************
 # Start of main program
@@ -52,8 +54,8 @@ db_group = parser.add_mutually_exclusive_group()
 parser.add_argument("-a", "--accessionnumber",
                     help="specifies the accession number", type=str)
 parser.add_argument("-f", "--format",
-                    choices=["fasta","fasta_cds_na"],
-                    help="specifies the format (fasta by default)", type=str)
+                    choices=FORMAT_CHOICES,
+                    help="specifies the sequence format", type=str)
 db_group.add_argument("-p", "--protein", help="search the protein database",
                       action="store_true")
 db_group.add_argument("-n", "--nucleotide",
@@ -63,7 +65,7 @@ parser.add_argument("-y", "--yestoall", help=yestoall_help, action="store_true")
 args = parser.parse_args()
 
 accession_number = ""
-sequence_format = "fasta"
+sequence_format = ""
 database = ""
 if args.accessionnumber:
     accession_number = args.accessionnumber
@@ -78,6 +80,8 @@ if accession_number == "":
     accession_number = raw_input("Please enter your accession number: ")
 if database == "":
     database = user_interaction.ask_for_database()
+if sequence_format == "":
+    sequence_format = user_interaction.ask_for_sequence_format(FORMAT_CHOICES)
 
 search_xml = get_from_url(url_construction.construct_search_url(database,
                                                                 accession_number))

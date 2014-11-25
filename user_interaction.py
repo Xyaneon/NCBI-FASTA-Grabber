@@ -17,7 +17,7 @@
 
 # MCS 5603 Intro to Bioinformatics, Fall 2014
 # Christopher Kyle Horton (000516274), chorton@ltu.edu
-# Last modified: 11/24/2014
+# Last modified: 11/25/2014
 
 def answer(question):
     '''Returns an answer to a question.'''
@@ -41,6 +41,19 @@ def ask_for_database():
         else:
             show_invalid_input_message()
     return database
+
+def ask_for_sequence_format(format_list):
+    '''Ask the user which format they want to use and return it.'''
+    while True:
+        question = "Which sequence format should be returned ("
+        question += ", ".join(format_list)
+        question += ")?: "
+        sequence_format = answer(question)
+        if sequence_format in format_list:
+            break
+        else:
+            show_invalid_input_message()
+    return sequence_format
 
 def ask_yes_no(question, no_string):
     '''Exit this function only when the user answers yes to a yes/no
