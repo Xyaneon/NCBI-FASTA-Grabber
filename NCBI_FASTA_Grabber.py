@@ -27,7 +27,7 @@ import generate_output
 import url_construction
 import user_interaction
 
-VERSION = "v1.3.1"
+VERSION = "v1.4.0"
 DESC = "NCBI-FASTA-Grabber " + VERSION + "\nFetches FASTA sequences from NCBI."
 
 def get_from_url(url):
@@ -61,6 +61,9 @@ db_group.add_argument("-p", "--protein", help="search the protein database",
 db_group.add_argument("-n", "--nucleotide",
                       help="search the nucleotide database (default)",
                       action="store_true")
+parser.add_argument("-o", "--output-file",
+                    help="specifies a filename to write the sequence to",
+                    type=str)
 parser.add_argument("-y", "--yestoall", help=yestoall_help, action="store_true")
 args = parser.parse_args()
 
@@ -133,6 +136,11 @@ fasta = get_from_url(url_construction.construct_fetch_url(database,
 
 # Final sequence output
 generate_output.print_fasta(fasta)
-generate_output.ask_if_copy_to_clipboard(fasta, args.yestoall)
+if args.output_file:
+    # Write the sequence to the specified filename.
+    generate_output.write_sequence_to_file(fasta, args.output_file)
+else:
+    # Copy the sequence to the clipboard
+    generate_output.ask_if_copy_to_clipboard(fasta, args.yestoall)
 
-exit(1)
+exit(0)

@@ -55,3 +55,6 @@ target/
 
 # Temporary editor files
 *~
+
+# FASTA files
+*.fasta

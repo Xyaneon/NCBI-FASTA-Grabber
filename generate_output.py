@@ -42,3 +42,13 @@ def ask_if_copy_to_clipboard(fasta, auto_yes):
         user_interaction.ask_yes_no("Copy to clipboard", "Alright then. Bye!")
     pyperclip.copy(fasta)
     print "FASTA sequence copied to clipboard."
+
+def write_sequence_to_file(fasta, output_file):
+    '''Write the given FASTA sequence to the given filename.'''
+    try:
+        with open(output_file, 'w') as f:
+            f.write(fasta)
+            print "Sequence written to {}".format(output_file)
+    except:
+        print "Error: could not write to {}".format(output_file)
+        exit(1)
