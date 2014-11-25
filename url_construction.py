@@ -17,7 +17,7 @@
 
 # MCS 5603 Intro to Bioinformatics, Fall 2014
 # Christopher Kyle Horton (000516274), chorton@ltu.edu
-# Last modified: 11/24/2014
+# Last modified: 11/25/2014
 
 eutils_url = "http://eutils.ncbi.nlm.nih.gov/entrez/eutils/"
 
@@ -33,9 +33,11 @@ def construct_summary_url(database, results_id):
     url += "&id=" + results_id
     return url
 
-def construct_fetch_url(database, results_id):
+def construct_fetch_url(database, results_id, sequence_format="fasta"):
     '''Creates the fetch URL string.'''
     url = eutils_url + "efetch.fcgi?db=" + database
     url += "&id=" + results_id
-    url += "&rettype=fasta&retmode=text"
+    url += "&rettype="
+    url += sequence_format
+    url += "&retmode=text"
     return url

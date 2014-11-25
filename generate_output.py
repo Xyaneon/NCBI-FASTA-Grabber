@@ -17,9 +17,11 @@
 
 # MCS 5603 Intro to Bioinformatics, Fall 2014
 # Christopher Kyle Horton (000516274), chorton@ltu.edu
-# Last modified: 11/24/2014
+# Last modified: 11/25/2014
 
 import pyperclip
+
+import user_interaction
 
 def print_summary(title, caption, extra):
     '''Prints the formatted summary information.'''
@@ -36,7 +38,7 @@ def print_fasta(fasta):
 def ask_if_copy_to_clipboard(fasta, auto_yes):
     '''Ask the user if the FASTA sequence should be copied to the clipboard,
     if we're not told to automatically do so.'''
-    if not args.yestoall:
+    if not auto_yes:
         user_interaction.ask_yes_no("Copy to clipboard", "Alright then. Bye!")
     pyperclip.copy(fasta)
     print "FASTA sequence copied to clipboard."

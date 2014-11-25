@@ -17,7 +17,7 @@
 
 # MCS 5603 Intro to Bioinformatics, Fall 2014
 # Christopher Kyle Horton (000516274), chorton@ltu.edu
-# Last modified: 11/24/2014
+# Last modified: 11/25/2014
 
 import argparse
 import urllib
@@ -27,7 +27,7 @@ import generate_output
 import url_construction
 import user_interaction
 
-VERSION = "v1.2.0"
+VERSION = "v1.3.0"
 DESC = "NCBI-FASTA-Grabber " + VERSION + "\nFetches FASTA sequences from NCBI."
 
 def get_from_url(url):
@@ -51,6 +51,9 @@ clipboard automatically, if available"""
 db_group = parser.add_mutually_exclusive_group()
 parser.add_argument("-a", "--accessionnumber",
                     help="specifies the accession number", type=str)
+parser.add_argument("-f", "--format",
+                    choices=["fasta","fasta_cds_na"],
+                    help="specifies the format (fasta by default)", type=str)
 db_group.add_argument("-p", "--protein", help="search the protein database",
                       action="store_true")
 db_group.add_argument("-n", "--nucleotide",
@@ -60,9 +63,12 @@ parser.add_argument("-y", "--yestoall", help=yestoall_help, action="store_true")
 args = parser.parse_args()
 
 accession_number = ""
+sequence_format = "fasta"
 database = ""
 if args.accessionnumber:
     accession_number = args.accessionnumber
+if args.format:
+    sequence_format = args.format
 if args.protein:
     database = "protein"
 else:
@@ -73,7 +79,8 @@ if accession_number == "":
 if database == "":
     database = user_interaction.ask_for_database()
 
-search_xml = get_from_url(url_construction.construct_search_url(database, accession_number))
+search_xml = get_from_url(url_construction.construct_search_url(database,
+                                                                accession_number))
 root = elementtree.fromstring(search_xml)
 
 # Check if there were any matches
@@ -94,7 +101,8 @@ else:
     exit(2)
 
 # Print summary for result. Need Caption, Title, and Extra
-summary_xml = get_from_url(url_construction.construct_summary_url(database, results_id))
+summary_xml = get_from_url(url_construction.construct_summary_url(database,
+                                                                  results_id))
 root = elementtree.fromstring(summary_xml)
 
 caption = "n/a"
@@ -112,9 +120,12 @@ for item in root.iter("Item"):
 generate_output.print_summary(caption, title, extra)
 
 if not args.yestoall:
-    user_interaction.ask_yes_no("\nIs this the result you were looking for", "Sorry about that.")
+    user_interaction.ask_yes_no("\nIs this the result you were looking for",
+                                "Sorry about that.")
 
-fasta = get_from_url(url_construction.construct_fetch_url(database, results_id))
+fasta = get_from_url(url_construction.construct_fetch_url(database,
+                                                          results_id,
+                                                          sequence_format))
 
 # Final sequence output
 generate_output.print_fasta(fasta)
