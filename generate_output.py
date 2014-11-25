@@ -48,7 +48,7 @@ def write_sequence_to_file(fasta, output_file):
     try:
         with open(output_file, 'w') as f:
             f.write(fasta)
-            print "Sequence written to {}".format(output_file)
+            print "Sequence written to {}.".format(output_file)
     except:
-        print "Error: could not write to {}".format(output_file)
+        print "Error: could not write to {}.".format(output_file)
         exit(1)
